@@ -1,0 +1,114 @@
+---
+name: expect-the-unexpected
+description: >-
+  Use when the user asks what could break / go wrong / fail in a SPECIFIC
+  scenario (e.g. "what if this webhook fires twice", "a user uploads a 2GB
+  file", "1000 signups land in one minute"); asks to pressure-test, stress-test,
+  or red-team a particular code path or feature; or wants a pre-launch /
+  pre-ship / pre-deploy check on a feature before it goes live. Works at design
+  time (before code exists) and on existing code. Do NOT use for generic
+  full-codebase reviews, "review my whole repo", or "find bugs everywhere" —
+  that is a code-review skill's job; this skill needs ONE scenario to trace.
+---
+
+# Expect the Unexpected
+
+## Overview
+
+Scenario-driven failure-mode analysis. Given **one specific scenario**, trace
+its execution path and systematically surface what could break — ranked by risk,
+each with a concrete mitigation or a test to write.
+
+**Core principle:** Forward reasoning misses things. Walk a fixed taxonomy
+against the path AND run a pre-mortem ("assume it already failed in prod"). The
+two passes catch different failures.
+
+**This is v1 — REASONING ONLY.** Predict failures and generate test cases for
+the user to run. Do **not** execute tests, run code, or modify files.
+
+## When to Use
+
+- "What could go wrong if…" / "what breaks when…" for a named scenario
+- "Pressure-test / stress-test / red-team this path before we ship"
+- Pre-launch / pre-deploy gut-check on a feature or endpoint
+- Design-time review: a proposed flow, no code yet
+
+**Do NOT use when:** the user wants a whole-repo review or open-ended bug hunt
+with no scenario. Route that to a code-review skill instead.
+
+## Workflow
+
+### 1. Pin down the scenario (REQUIRED)
+
+The scenario is the primary input. If the user gave code but **no scenario**,
+STOP and ask which path/scenario to analyze (e.g. "the checkout POST handler
+when the payment provider times out?"). Do not analyze a whole file blindly.
+
+Then state the execution path you will trace in 1-3 lines: entry point →
+key steps → external calls → side effects → response. This anchors the analysis.
+
+### 2. Walk the failure taxonomy
+
+**READ `references/failure-taxonomy.md` now** and walk every category against
+this scenario's path. Categories: inputs, state & timing, external dependencies,
+resources & scale, auth & security, time, money/SaaS, and
+failure-of-the-failure. Skip a category only after confirming it does not touch
+this path.
+
+### 3. Pre-mortem pass
+
+After the forward walk, run this prompt explicitly:
+
+> "Assume this scenario has ALREADY caused a catastrophic, customer-visible
+> failure in production. Narrate exactly what happened, step by step."
+
+Use the narration to catch failures the forward walk missed. Add any new ones to
+the findings.
+
+### 4. Output FMEA-style, ranked by risk
+
+For each failure mode, one row:
+
+| Failure mode | Trigger | Symptom | Likelihood | Impact | Risk | Mitigation / Test to write |
+
+- **Likelihood** and **Impact**: Low / Med / High.
+- **Risk**: combined rating used to sort — highest risk on top.
+- **Mitigation / Test**: a concrete fix OR a specific test case the user can
+  write (inputs + expected behavior). Prefer a test when the fix is unclear.
+
+Group nothing; just rank. Lead with the top 3-5 so the user sees what matters.
+
+### 5. Coverage note (REQUIRED — end every run with this)
+
+Always close with, verbatim in spirit:
+
+> "These are known failure classes for this path; this is not proof of
+> correctness. Untested classes and anything outside this scenario remain
+> unverified."
+
+Never imply the software is now safe or "done."
+
+## Quick Reference
+
+| Step | Do | Don't |
+|------|-----|-------|
+| Input | Require ONE scenario | Analyze whole repo |
+| Trace | State the path first | Jump to findings |
+| Taxonomy | Read the reference, walk all 8 | Rely on memory |
+| Pre-mortem | Narrate the prod disaster | Skip it (forward-only misses things) |
+| Output | FMEA table ranked by risk | Unranked wall of text |
+| Code/tests | Suggest tests to write | Execute tests or edit code (v1) |
+| Close | Coverage caveat | Claim it's safe |
+
+## Common Mistakes
+
+- **No scenario → analyzing anyway.** Ask first. A path is required.
+- **Forward-only.** Skipping the pre-mortem is the #1 way real failures slip
+  through. Do both passes.
+- **Vague mitigations** ("add validation"). Name the input and the expected
+  behavior, or write the actual test case.
+- **Unranked output.** The user needs the highest-risk items first.
+- **Overreach.** v1 does not run tests or change code. Stay in reasoning mode.
+- **False assurance.** Always end with the coverage caveat.
+
+See `README.md` for self-contained / plugin-promotion notes.
