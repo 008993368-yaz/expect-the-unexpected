@@ -10,9 +10,10 @@ or test cases. Works at design time (before code exists) and on existing code.
 
 ```
 expect-the-unexpected/
-  SKILL.md                       # Lean entry point + workflow (read first)
+  SKILL.md                       # Lean entry point + routing + per-scenario flow (read first)
   references/
-    failure-taxonomy.md          # Full 8-category taxonomy + pre-mortem prompt
+    failure-taxonomy.md          # 8-category taxonomy (lens + generator) + pre-mortem
+    scenario-generation.md       # Stage 0: bounded surface -> ranked scenario menu
   README.md                      # This file
 ```
 
@@ -21,21 +22,25 @@ expect-the-unexpected/
 This folder has **no external dependencies**. It can be moved into a plugin's
 `skills/` directory unchanged — nothing references paths outside this folder.
 
-## v1 scope: reasoning only
+## v2 scope: reasoning only, now with scenario generation
 
-v1 predicts failures and generates test cases for the user to run. It does
-**not** execute tests or modify code, and it never claims the software is "safe."
+Two modes: analyze a user-supplied scenario, OR generate scenarios from a bounded
+surface (diff/PR, file, endpoint, or feature description) and let the user pick
+which to analyze. Either way it predicts failures and generates test cases — it
+does **not** execute tests or modify code, and it never claims the software is
+"safe."
 
 ## Future (NOT built — do not preclude)
 
-The structure is intentionally compatible with later promotion to a plugin that
-could add — none of which exist today:
+The structure stays compatible with later promotion to a plugin that could add —
+none of which exist today:
 
-- **Pre-deploy gate hook** — a hook that auto-runs this analysis as a gate
-  before deploy. Would live in the plugin's `hooks/`, not here.
+- **Pre-deploy gate hook** — a hook that auto-runs the analysis as a gate before
+  deploy, using Stage 0's diff mode with no human-typed scenario. Would live in
+  the plugin's `hooks/`, not here.
 - **MCP server to execute tests** — a server that actually runs the generated
-  test cases instead of only suggesting them. Would live in the plugin's MCP
-  config, not here.
+  test cases instead of only suggesting them (a possible v3). Would live in the
+  plugin's MCP config, not here.
 
 Keep `SKILL.md` and `references/` free of any assumption that these exist so the
 skill keeps working standalone.
