@@ -25,11 +25,17 @@ each with a concrete mitigation or a test to write.
 against the path AND run a pre-mortem ("assume it already failed in prod"). The
 two passes catch different failures.
 
-**v2 — REASONING ONLY.** Two modes: (a) the user gives one scenario → trace and
-analyze it; (b) the user gives a bounded surface but no scenario → **generate**
-the scenarios worth tracing, rank them, let the user pick, then analyze each.
-Either way: predict failures and generate test cases for the user to run. Do
-**not** execute tests, run code, or modify files.
+## Capabilities
+
+**Reasoning mode (default).** Two analysis paths: (a) the user gives one scenario
+→ trace and analyze it; (b) the user gives a bounded surface but no scenario →
+**generate** the scenarios worth tracing, rank them, let the user pick, then
+analyze each. Either way: predict failures and generate test cases for the user
+to run. Do **not** execute tests, run code, or modify files.
+
+**Execution mode (not built).** An optional future extension — run generated
+tests via MCP or host hooks. This skill must remain correct without it; do not
+assume execution tooling exists.
 
 ## When to Use
 
@@ -124,7 +130,7 @@ Never imply the software is now safe or "done."
 | Taxonomy | Read the reference, walk all 8 | Rely on memory |
 | Pre-mortem | Narrate the prod disaster | Skip it (forward-only misses things) |
 | Output | FMEA table ranked by risk | Unranked wall of text |
-| Code/tests | Suggest tests to write | Execute tests or edit code (v2 is reasoning-only) |
+| Code/tests | Suggest tests to write | Execute tests or edit code (reasoning mode only) |
 | Close | Coverage caveat | Claim it's safe |
 
 ## Common Mistakes
@@ -142,7 +148,8 @@ Never imply the software is now safe or "done."
 - **Vague mitigations** ("add validation"). Name the input and the expected
   behavior, or write the actual test case.
 - **Unranked output.** The user needs the highest-risk items first.
-- **Overreach.** v2 does not run tests or change code. Stay in reasoning mode.
+- **Overreach.** Reasoning mode does not run tests or change code. Stay in
+  reasoning mode unless execution tooling is explicitly available and requested.
 - **False assurance.** Always end with the coverage caveat.
 
-See `README.md` for self-contained / plugin-promotion notes.
+See `README.md` for install paths and optional extensions.

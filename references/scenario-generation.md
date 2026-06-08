@@ -19,8 +19,8 @@ A surface is one of:
 
 If the user gives none of these (e.g. "review my whole repo", "find all bugs"),
 **refuse** — name the four surfaces and ask the user to pick one (e.g. "point me
-at the diff, a file, an endpoint, or describe the feature"). v2 generates
-scenarios from a bounded surface, not from the whole codebase.
+at the diff, a file, an endpoint, or describe the feature"). Reasoning mode
+generates scenarios from a bounded surface, not from the whole codebase.
 
 ## Procedure
 
@@ -45,11 +45,12 @@ On that surface, list:
 
 > "What concrete scenario on THIS surface would exercise this category?"
 
-This is the inverse of the v1 walk. v1 asks "given this scenario, what does this
-category break?"; here you ask "given this surface, what scenario makes this
-category bite?" One category often yields several candidate scenarios — keep each
-as its own candidate. Anchor every scenario to a specific anchor from step 2
-(e.g. "the Stripe webhook handler" not "some endpoint").
+This is the inverse of the per-scenario taxonomy walk. The per-scenario flow
+asks "given this scenario, what does this category break?"; here you ask "given
+this surface, what scenario makes this category bite?" One category often yields
+several candidate scenarios — keep each as its own candidate. Anchor every
+scenario to a specific anchor from step 2 (e.g. "the Stripe webhook handler" not
+"some endpoint").
 
 A scenario is concrete and traceable, e.g. "the payment webhook is delivered
 twice" — never a category label like "check inputs".
@@ -66,7 +67,7 @@ Rank highest combined first.
 ### 5. Cap and present a menu
 
 Present the top **5–8** scenarios as a ranked menu (fewer is fine for a small
-  surface — don't pad a sparse menu to hit a number). One line each: the scenario +
+surface — don't pad a sparse menu to hit a number). One line each: the scenario +
 why it's risky (the anchor it touches and the category it exercises). The menu is
 useful output on its own, before any deep analysis.
 
@@ -79,7 +80,7 @@ Then ask the user which to analyze. "Do the top N" is a valid pick.
 
 For each scenario the user picks, run the normal per-scenario flow in `SKILL.md`
 (state the path → walk the taxonomy → pre-mortem → FMEA → coverage caveat),
-exactly as v1 does for a user-supplied scenario.
+exactly as for a user-supplied scenario.
 
 The closing coverage caveat must additionally note: scenarios that were generated
 but **not selected**, and any surface area dropped by the cap, remain unanalyzed.
