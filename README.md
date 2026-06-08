@@ -1,6 +1,7 @@
 # expect-the-unexpected
 
-A scenario-driven failure-mode analysis skill for [Claude Code](https://claude.com/claude-code).
+A scenario-driven failure-mode analysis skill for AI coding agents — Cursor,
+Claude Code, Codex, GitHub Copilot, and any host that supports the [Agent Skills](https://agentskills.io) format.
 
 Give it **one specific scenario** — "a payment webhook arrives twice", "a user
 uploads a 2GB file" — and it traces the execution path, surfaces what could break
@@ -12,18 +13,41 @@ design time (before code exists) as well as on existing code.
 
 ## Install
 
-The skill is project-local. It lives at:
+This repo **is** the skill package. Clone it, then link or copy it into the
+skills directory your agent expects.
 
-```
-.claude/skills/expect-the-unexpected/
+| Agent / host | Project path | Global path |
+|--------------|--------------|-------------|
+| Open standard | `.agents/skills/expect-the-unexpected/` | `~/.agents/skills/expect-the-unexpected/` |
+| Cursor | `.cursor/skills/expect-the-unexpected/` | `~/.cursor/skills/expect-the-unexpected/` |
+| Claude Code | `.claude/skills/expect-the-unexpected/` | `~/.claude/skills/expect-the-unexpected/` |
+| Codex | `.codex/skills/expect-the-unexpected/` | `~/.codex/skills/expect-the-unexpected/` |
+| GitHub Copilot | `.github/skills/expect-the-unexpected/` | — |
+
+Cursor also loads `.claude/skills/` and `.codex/skills/` for compatibility, but
+installing to the path for your primary agent keeps discovery explicit.
+
+**Unix / macOS (symlink, project-local):**
+
+```bash
+git clone https://github.com/<you>/expect-the-unexpected.git
+ln -s /path/to/expect-the-unexpected .cursor/skills/expect-the-unexpected
 ```
 
-Claude Code auto-discovers skills under `.claude/skills/`, so cloning this repo
-into your workspace is enough — no further setup.
+**PowerShell (symlink, project-local):**
+
+```powershell
+git clone https://github.com/<you>/expect-the-unexpected.git
+New-Item -ItemType SymbolicLink -Path .cursor\skills\expect-the-unexpected -Target C:\path\to\expect-the-unexpected
+```
+
+**Copy instead of symlink:** copy the cloned repo directory to the target path
+above. The skill folder must contain `SKILL.md` at its root.
 
 ## Usage
 
-Just describe a scenario in plain language. The skill triggers when you:
+Describe a scenario in plain language, or invoke the skill by name (`/expect-the-unexpected`
+where your host supports slash commands). The skill triggers when you:
 
 - ask what could break / go wrong / fail in a **specific** scenario
 - give a **bounded surface** (a diff/PR, file, endpoint, or feature) and want the
@@ -67,23 +91,42 @@ Examples:
 
 ## Scope
 
-**v2 is reasoning-only.** It predicts failures and generates test cases for you
-to run — and now also generates the scenarios themselves from a bounded surface.
-It does not execute tests or modify code, and it never claims the software is
-"safe."
+**Reasoning mode (default).** The skill predicts failures and generates test
+cases for you to run — and generates scenarios themselves from a bounded surface
+when needed. It does not execute tests or modify code, and it never claims the
+software is "safe."
 
 ## Layout
 
 ```
-.claude/skills/expect-the-unexpected/
+expect-the-unexpected/
   SKILL.md                     # Lean entry point + routing + per-scenario flow
   references/
     failure-taxonomy.md        # 8-category taxonomy (lens + generator) + pre-mortem
     scenario-generation.md     # Stage 0: bounded surface -> ranked scenario menu
-  README.md                    # Skill-internal notes + future-proofing
+  README.md                    # Install + design notes (this file)
 ```
 
-The skill folder is fully self-contained (no external dependencies), so it can
-be moved into a plugin's `skills/` directory unchanged. See the skill's own
-`README.md` for planned-but-not-built future additions (a pre-deploy gate hook
-and an MCP server to execute generated tests).
+## Design
+
+**Self-contained.** This package has no external dependencies. Nothing references
+paths outside this folder — copy or symlink it into any host's skills directory
+unchanged.
+
+**Agent-agnostic.** The skill uses standard `SKILL.md` frontmatter (`name`,
+`description`) and folder-relative `references/` links. No host-specific APIs or
+assumptions.
+
+## Optional extensions (not built)
+
+The structure stays compatible with host-specific add-ons — none of which exist
+in this repo today:
+
+- **Pre-deploy gate hook** — auto-run Stage 0 diff analysis before deploy. Lives
+  in the host's `hooks/` config, not in this skill folder.
+- **Execution mode** — run generated test cases via an MCP server or similar
+  tooling instead of only suggesting them. Lives in the host's MCP/tooling config,
+  not here.
+
+`SKILL.md` and `references/` are written so the skill works standalone without
+either extension.
