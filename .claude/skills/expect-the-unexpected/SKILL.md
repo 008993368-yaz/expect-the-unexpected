@@ -37,6 +37,7 @@ Either way: predict failures and generate test cases for the user to run. Do
 - "Pressure-test / stress-test / red-team this path before we ship"
 - Pre-launch / pre-deploy gut-check on a feature or endpoint
 - Design-time review: a proposed flow, no code yet
+- A bounded surface (a diff/PR, file, endpoint, or feature) but **no scenario yet** — Stage 0 generates the candidate scenarios for you
 
 **Do NOT use when:** the user wants a whole-repo review or open-ended bug hunt
 with no scenario. Route that to a code-review skill instead.
@@ -44,14 +45,14 @@ with no scenario. Route that to a code-review skill instead.
 ## Routing
 
 | User gives… | Do |
-|---|---|
+|-------------|-----|
 | A specific scenario | Skip to the per-scenario flow below (Steps 1–5). |
 | A bounded surface, no scenario | Run **Stage 0** (scenario generation), then Steps 1–5 per chosen scenario. |
 | Nothing / "review my whole repo" | Refuse — ask for a bounded surface (a diff, file, endpoint, or feature). |
 
 ### Stage 0 — generate scenarios (when no scenario was given)
 
-The user has a bounded surface (a diff/PR by default, or a file, endpoint, or
+The user has a bounded surface (usually a diff/PR, or a file, endpoint, or
 feature description) but doesn't know what to fear. **READ
 `references/scenario-generation.md` now** and follow it: gather the surface →
 extract risk anchors → run the taxonomy *in reverse* as a scenario generator →
@@ -64,8 +65,7 @@ each chosen scenario.
 ### 1. Pin down the scenario
 
 The scenario is the primary input. If the user gave code but **no scenario**, do not analyze a whole file blindly —
-go to Routing above (use Stage 0 to generate scenarios, or ask for a bounded
-surface).
+go to Routing above.
 
 Then state the execution path you will trace in 1-3 lines: entry point →
 key steps → external calls → side effects → response. This anchors the analysis.
