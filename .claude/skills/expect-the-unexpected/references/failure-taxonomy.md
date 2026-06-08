@@ -6,6 +6,12 @@ category only after confirming it cannot touch the path. Strong coverage of
 web/SaaS scenarios (auth, payments, uploads, webhooks) is intentional, but the
 taxonomy is general-purpose.
 
+**Two directions.** This taxonomy is used both ways. As a **lens** (the
+per-scenario flow): given a scenario, ask what each category breaks. As a
+**generator** (Stage 0, see `scenario-generation.md`): given a bounded surface,
+ask what concrete scenario on that surface would *exercise* each category. Same
+8 categories, opposite questions.
+
 Use these as failure-mode generators, not a checklist to tick. One prompt often
 surfaces several distinct failure modes — capture each as its own FMEA row.
 
