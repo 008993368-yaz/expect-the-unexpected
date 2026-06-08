@@ -18,8 +18,9 @@ A surface is one of:
 - **An endpoint / entry point** — a named route; trace inward from it.
 
 If the user gives none of these (e.g. "review my whole repo", "find all bugs"),
-**refuse** — ask for a bounded surface. v2 generates scenarios from a fence, not
-from the whole codebase.
+**refuse** — name the four surfaces and ask the user to pick one (e.g. "point me
+at the diff, a file, an endpoint, or describe the feature"). v2 generates
+scenarios from a bounded surface, not from the whole codebase.
 
 ## Procedure
 
@@ -40,7 +41,7 @@ On that surface, list:
 
 ### 3. Run the taxonomy IN REVERSE as a generator
 
-Read `references/failure-taxonomy.md`. For each of the 8 categories, ask:
+**READ `references/failure-taxonomy.md` now.** For each of its 8 categories, ask:
 
 > "What concrete scenario on THIS surface would exercise this category?"
 
@@ -64,7 +65,8 @@ Rank highest combined first.
 
 ### 5. Cap and present a menu
 
-Present the top **5–8** scenarios as a ranked menu. One line each: the scenario +
+Present the top **5–8** scenarios as a ranked menu (fewer is fine for a small
+  surface — don't pad a sparse menu to hit a number). One line each: the scenario +
 why it's risky (the anchor it touches and the category it exercises). The menu is
 useful output on its own, before any deep analysis.
 
