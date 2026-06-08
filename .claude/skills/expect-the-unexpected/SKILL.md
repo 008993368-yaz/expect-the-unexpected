@@ -3,12 +3,14 @@ name: expect-the-unexpected
 description: >-
   Use when the user asks what could break / go wrong / fail in a SPECIFIC
   scenario (e.g. "what if this webhook fires twice", "a user uploads a 2GB
-  file", "1000 signups land in one minute"); asks to pressure-test, stress-test,
-  or red-team a particular code path or feature; or wants a pre-launch /
-  pre-ship / pre-deploy check on a feature before it goes live. Works at design
-  time (before code exists) and on existing code. Do NOT use for generic
+  file"); OR gives a bounded surface (a diff/PR, one file, an endpoint, or a
+  feature description) and wants the risky scenarios surfaced FOR them ("what
+  should I worry about before shipping this change?"); asks to pressure-test,
+  stress-test, or red-team a path; or wants a pre-launch / pre-ship / pre-deploy
+  check. Works at design time and on existing code. Do NOT use for generic
   full-codebase reviews, "review my whole repo", or "find bugs everywhere" —
-  that is a code-review skill's job; this skill needs ONE scenario to trace.
+  that needs a bounded surface (a diff, file, endpoint, or feature), not the
+  whole repo.
 ---
 
 # Expect the Unexpected
@@ -23,8 +25,11 @@ each with a concrete mitigation or a test to write.
 against the path AND run a pre-mortem ("assume it already failed in prod"). The
 two passes catch different failures.
 
-**This is v1 — REASONING ONLY.** Predict failures and generate test cases for
-the user to run. Do **not** execute tests, run code, or modify files.
+**v2 — REASONING ONLY.** Two modes: (a) the user gives one scenario → trace and
+analyze it; (b) the user gives a bounded surface but no scenario → **generate**
+the scenarios worth tracing, rank them, let the user pick, then analyze each.
+Either way: predict failures and generate test cases for the user to run. Do
+**not** execute tests, run code, or modify files.
 
 ## When to Use
 
@@ -32,17 +37,35 @@ the user to run. Do **not** execute tests, run code, or modify files.
 - "Pressure-test / stress-test / red-team this path before we ship"
 - Pre-launch / pre-deploy gut-check on a feature or endpoint
 - Design-time review: a proposed flow, no code yet
+- A bounded surface (a diff/PR, file, endpoint, or feature) but **no scenario yet** — Stage 0 generates the candidate scenarios for you
 
 **Do NOT use when:** the user wants a whole-repo review or open-ended bug hunt
 with no scenario. Route that to a code-review skill instead.
 
-## Workflow
+## Routing
 
-### 1. Pin down the scenario (REQUIRED)
+| User gives… | Do |
+|-------------|-----|
+| A specific scenario | Skip to the per-scenario flow below (Steps 1–5). |
+| A bounded surface, no scenario | Run **Stage 0** (scenario generation), then Steps 1–5 per chosen scenario. |
+| Nothing / "review my whole repo" | Refuse — ask for a bounded surface (a diff, file, endpoint, or feature). |
 
-The scenario is the primary input. If the user gave code but **no scenario**,
-STOP and ask which path/scenario to analyze (e.g. "the checkout POST handler
-when the payment provider times out?"). Do not analyze a whole file blindly.
+### Stage 0 — generate scenarios (when no scenario was given)
+
+The user has a bounded surface (usually a diff/PR, or a file, endpoint, or
+feature description) but doesn't know what to fear. **READ
+`references/scenario-generation.md` now** and follow it: gather the surface →
+extract risk anchors → run the taxonomy *in reverse* as a scenario generator →
+rank by blast radius × plausibility → present a ranked menu of ~5–8 concrete
+scenarios → let the user pick ("top N" is valid). Then run Steps 1–5 below on
+each chosen scenario.
+
+## Per-scenario flow (Steps 1–5)
+
+### 1. Pin down the scenario
+
+The scenario is the primary input. If the user gave code but **no scenario**, do not analyze a whole file blindly —
+go to Routing above.
 
 Then state the execution path you will trace in 1-3 lines: entry point →
 key steps → external calls → side effects → response. This anchors the analysis.
@@ -86,29 +109,40 @@ Always close with, verbatim in spirit:
 > correctness. Untested classes and anything outside this scenario remain
 > unverified."
 
+If Stage 0 ran, also note: scenarios that were generated but **not selected**,
+and any surface area dropped by the cap, remain unanalyzed.
+
 Never imply the software is now safe or "done."
 
 ## Quick Reference
 
 | Step | Do | Don't |
 |------|-----|-------|
-| Input | Require ONE scenario | Analyze whole repo |
+| Input | Require a scenario OR a bounded surface | Analyze whole repo |
+| Generate | Stage 0: surface → ranked scenario menu | Invent scenarios with no surface |
 | Trace | State the path first | Jump to findings |
 | Taxonomy | Read the reference, walk all 8 | Rely on memory |
 | Pre-mortem | Narrate the prod disaster | Skip it (forward-only misses things) |
 | Output | FMEA table ranked by risk | Unranked wall of text |
-| Code/tests | Suggest tests to write | Execute tests or edit code (v1) |
+| Code/tests | Suggest tests to write | Execute tests or edit code (v2 is reasoning-only) |
 | Close | Coverage caveat | Claim it's safe |
 
 ## Common Mistakes
 
-- **No scenario → analyzing anyway.** Ask first. A path is required.
+- **No scenario → analyzing the whole file anyway.** Don't. Either run Stage 0
+  to generate scenarios from the bounded surface, or ask for a bounded surface.
+- **Generating without a surface.** Stage 0 needs a fence (diff, file, endpoint,
+  feature). Inventing scenarios from nothing = the whole-repo hunt this skill
+  refuses.
+- **Menu of vague scenarios.** Each generated scenario must be concrete and
+  traceable ("the webhook fires twice"), anchored to a real entry point/side
+  effect — never a category label ("check inputs").
 - **Forward-only.** Skipping the pre-mortem is the #1 way real failures slip
   through. Do both passes.
 - **Vague mitigations** ("add validation"). Name the input and the expected
   behavior, or write the actual test case.
 - **Unranked output.** The user needs the highest-risk items first.
-- **Overreach.** v1 does not run tests or change code. Stay in reasoning mode.
+- **Overreach.** v2 does not run tests or change code. Stay in reasoning mode.
 - **False assurance.** Always end with the coverage caveat.
 
 See `README.md` for self-contained / plugin-promotion notes.
