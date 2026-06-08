@@ -1,5 +1,6 @@
 ---
 name: expect-the-unexpected
+license: MIT
 description: >-
   Use when the user asks what could break / go wrong / fail in a SPECIFIC
   scenario (e.g. "what if this webhook fires twice", "a user uploads a 2GB

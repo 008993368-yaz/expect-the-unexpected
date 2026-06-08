@@ -30,14 +30,14 @@ installing to the path for your primary agent keeps discovery explicit.
 **Unix / macOS (symlink, project-local):**
 
 ```bash
-git clone https://github.com/<you>/expect-the-unexpected.git
+git clone https://github.com/008993368-yaz/expect-the-unexpected.git
 ln -s /path/to/expect-the-unexpected .cursor/skills/expect-the-unexpected
 ```
 
 **PowerShell (symlink, project-local):**
 
 ```powershell
-git clone https://github.com/<you>/expect-the-unexpected.git
+git clone https://github.com/008993368-yaz/expect-the-unexpected.git
 New-Item -ItemType SymbolicLink -Path .cursor\skills\expect-the-unexpected -Target C:\path\to\expect-the-unexpected
 ```
 
@@ -130,3 +130,7 @@ in this repo today:
 
 `SKILL.md` and `references/` are written so the skill works standalone without
 either extension.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
