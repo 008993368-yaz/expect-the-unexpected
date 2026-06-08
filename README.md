@@ -32,7 +32,8 @@ Just describe a scenario in plain language. The skill triggers when you:
 - want a pre-launch / pre-ship / pre-deploy check on a feature
 
 It does **not** trigger for generic full-codebase reviews ("review my whole
-repo") — that's a code-review skill's job. It needs one scenario to trace.
+repo") — it needs a bounded surface (a scenario, diff, file, endpoint, or
+feature), not the whole repo.
 
 Examples:
 
