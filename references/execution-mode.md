@@ -89,10 +89,13 @@ For each confirmed failure, **one at a time**:
 1. Present the mitigation from that FMEA row as a concrete change.
 2. Get the user's approval. They may skip this fix or stop the loop entirely.
 3. Apply the fix.
-4. Re-run that test. Report the new verdict.
+4. Re-run that test, then the other generated tests — a fix must not break a
+   sibling probe. Report the new verdicts.
 
-If the user declines a fix, leave the failing test in place — it documents the
-known bug — and note it in the close-out.
+If the user declines a fix, keep the test but mark it as an expected failure
+using the framework's convention (`xfail`, `test.todo`, `skip` with a reason —
+include the FMEA row in the reason) so the suite stays green while the known
+bug stays documented. Note it in the close-out.
 
 ### 7. Artifact lifecycle
 
@@ -107,5 +110,5 @@ End every execution-mode run with, verbatim in spirit:
 > evidence, not proof of correctness. Unselected rows, NOT EXECUTABLE rows,
 > and anything outside these scenarios remain unverified."
 
-Also list: declined fixes (known bugs left in place) and any INCONCLUSIVE
-rows.
+Also list: declined fixes (known bugs, tests marked expected-failure) and any
+INCONCLUSIVE rows.
