@@ -90,9 +90,9 @@ Examples:
    scenarios remain unanalyzed.
 7. **Execution offer (opt-in).** If the host can write files and run commands,
    it offers to turn selected FMEA rows into real test files, run them with
-   your project's test runner, and report per-row verdicts — offering approved
-   fixes, one at a time, for confirmed failures. Declining leaves the run
-   identical to reasoning mode.
+   your project's test runner, and report per-row verdicts — offering a fix
+   for each confirmed failure, one at a time, each requiring your approval.
+   Declining leaves the run identical to reasoning mode.
 
 ## Scope
 
@@ -101,10 +101,11 @@ cases for you to run — and generates scenarios themselves from a bounded surfa
 when needed. It does not execute tests or modify code, and it never claims the
 software is "safe."
 
-**Execution mode (opt-in).** After every analysis, the skill can — only with
-your explicit go-ahead — write the generated test cases into your project's
-test suite, run them with your own test runner, and report which failure modes
-are CONFIRMED, NOT REPRODUCED, or INCONCLUSIVE. Confirmed failures get the
+**Execution mode (opt-in).** After every analysis — when the host can write
+files and run commands — the skill can, with your explicit go-ahead, write the
+generated test cases into your project's test suite, run them with your own
+test runner, and report which failure modes are CONFIRMED, NOT REPRODUCED, or
+INCONCLUSIVE. Confirmed failures get the
 FMEA row's mitigation offered as a fix, one at a time, each requiring your
 approval. Generated tests are kept by default as regression coverage. External
 dependencies are always mocked — it never contacts real third-party services
