@@ -1,2 +1,5 @@
 # Superpowers brainstorming/spec docs — local only, not committed
 docs/superpowers/
+
+# Git worktrees (local isolation)
+.worktrees/

@@ -38,6 +38,8 @@ to run. Do **not** execute tests, run code, or modify files.
 tests via MCP or host hooks. This skill must remain correct without it; do not
 assume execution tooling exists.
 
+Optional Cursor pre-deploy hook: see `extensions/pre-deploy-gate/README.md`.
+
 ## When to Use
 
 - "What could go wrong if…" / "what breaks when…" for a named scenario

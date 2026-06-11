@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": ".cursor/hooks/pre-deploy-gate.sh",
+        "matcher": "vercel deploy|firebase deploy|netlify deploy|fly deploy|serverless deploy|npm run deploy|pnpm run deploy|yarn deploy|kubectl apply|helm upgrade|terraform apply",
+        "failClosed": false
+      }
+    ]
+  }
+}
