@@ -117,19 +117,18 @@ unchanged.
 `description`) and folder-relative `references/` links. No host-specific APIs or
 assumptions.
 
-## Optional extensions (not built)
+## Optional extensions
 
-The structure stays compatible with host-specific add-ons — none of which exist
-in this repo today:
+The structure stays compatible with host-specific add-ons. The skill works
+standalone without them.
 
-- **Pre-deploy gate hook** — auto-run Stage 0 diff analysis before deploy. Lives
-  in the host's `hooks/` config, not in this skill folder.
-- **Execution mode** — run generated test cases via an MCP server or similar
-  tooling instead of only suggesting them. Lives in the host's MCP/tooling config,
-  not here.
-
-`SKILL.md` and `references/` are written so the skill works standalone without
-either extension.
+- **Pre-deploy gate hook** *(built)* — optional host hook (Cursor, Claude Code, …)
+  that pauses deploy commands and injects the current git diff for Stage 0 analysis.
+  Install from [`extensions/pre-deploy-gate/`](extensions/pre-deploy-gate/README.md)
+  into your project's host hooks config (not into the skill folder).
+- **Execution mode** *(not built)* — run generated test cases via an MCP server or
+  similar tooling instead of only suggesting them. Would live in the host's
+  MCP/tooling config, not here.
 
 ## License
 
