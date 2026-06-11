@@ -34,9 +34,13 @@ two passes catch different failures.
 analyze each. Either way: predict failures and generate test cases for the user
 to run. Do **not** execute tests, run code, or modify files.
 
-**Execution mode (not built).** An optional future extension — run generated
-tests via MCP or host hooks. This skill must remain correct without it; do not
-assume execution tooling exists.
+**Execution mode (opt-in).** After the FMEA table and coverage note, offer to
+write the selected test cases as real test files and run them with the
+project's own test runner — reporting a per-row verdict (CONFIRMED / NOT
+REPRODUCED / INCONCLUSIVE) and offering a fix for each confirmed failure, one
+at a time, each requiring user approval. Entered ONLY on explicit user
+acceptance (see Step 6). In read-only hosts/modes, skip the offer; reasoning
+mode stands alone.
 
 Optional pre-deploy hook (Cursor, Claude Code, …): see `extensions/pre-deploy-gate/README.md`.
 
@@ -55,8 +59,8 @@ with no scenario. Route that to a code-review skill instead.
 
 | User gives… | Do |
 |-------------|-----|
-| A specific scenario | Skip to the per-scenario flow below (Steps 1–5). |
-| A bounded surface, no scenario | Run **Stage 0** (scenario generation), then Steps 1–5 per chosen scenario. |
+| A specific scenario | Skip to the per-scenario flow below (Steps 1–6). |
+| A bounded surface, no scenario | Run **Stage 0** (scenario generation), then Steps 1–6 per chosen scenario. |
 | Nothing / "review my whole repo" | Refuse — ask for a bounded surface (a diff, file, endpoint, or feature). |
 
 ### Stage 0 — generate scenarios (when no scenario was given)
@@ -66,10 +70,10 @@ feature description) but doesn't know what to fear. **READ
 `references/scenario-generation.md` now** and follow it: gather the surface →
 extract risk anchors → run the taxonomy *in reverse* as a scenario generator →
 rank by blast radius × plausibility → present a ranked menu of ~5–8 concrete
-scenarios → let the user pick ("top N" is valid). Then run Steps 1–5 below on
+scenarios → let the user pick ("top N" is valid). Then run Steps 1–6 below on
 each chosen scenario.
 
-## Per-scenario flow (Steps 1–5)
+## Per-scenario flow (Steps 1–6)
 
 ### 1. Pin down the scenario
 
@@ -123,6 +127,18 @@ and any surface area dropped by the cap, remain unanalyzed.
 
 Never imply the software is now safe or "done."
 
+### 6. Offer execution (opt-in)
+
+If the host can write files and run commands, append one line after the
+coverage note:
+
+> "Want me to write and run tests for any of these failure modes?"
+
+If the user accepts, have them pick rows if they haven't ("top N" is valid),
+then **READ `references/execution-mode.md` now** and follow it. If the user
+declines, or the host is read-only, the run ends here — a pure reasoning-mode
+run.
+
 ## Quick Reference
 
 | Step | Do | Don't |
@@ -133,7 +149,7 @@ Never imply the software is now safe or "done."
 | Taxonomy | Read the reference, walk all 8 | Rely on memory |
 | Pre-mortem | Narrate the prod disaster | Skip it (forward-only misses things) |
 | Output | FMEA table ranked by risk | Unranked wall of text |
-| Code/tests | Suggest tests to write | Execute tests or edit code (reasoning mode only) |
+| Code/tests | Suggest tests; write/run them only in execution mode after opt-in | Execute or fix anything without the explicit opt-in |
 | Close | Coverage caveat | Claim it's safe |
 
 ## Common Mistakes
@@ -151,8 +167,12 @@ Never imply the software is now safe or "done."
 - **Vague mitigations** ("add validation"). Name the input and the expected
   behavior, or write the actual test case.
 - **Unranked output.** The user needs the highest-risk items first.
-- **Overreach.** Reasoning mode does not run tests or change code. Stay in
-  reasoning mode unless execution tooling is explicitly available and requested.
+- **Overreach.** Reasoning mode does not run tests or change code. Enter
+  execution mode only after the user explicitly accepts the Step 6 offer —
+  never uninvited, and never by skipping the FMEA output.
+- **Treating NOT REPRODUCED as proof.** A passing generated test is evidence
+  the failure wasn't observed under that test — not proof the failure mode is
+  absent.
 - **False assurance.** Always end with the coverage caveat.
 
 See `README.md` for install paths and optional extensions.
