@@ -37,9 +37,10 @@ to run. Do **not** execute tests, run code, or modify files.
 **Execution mode (opt-in).** After the FMEA table and coverage note, offer to
 write the selected test cases as real test files and run them with the
 project's own test runner — reporting a per-row verdict (CONFIRMED / NOT
-REPRODUCED / INCONCLUSIVE) and offering approved fixes for confirmed failures,
-one at a time. Entered ONLY on explicit user acceptance (see Step 6). In
-read-only hosts/modes, skip the offer; reasoning mode stands alone.
+REPRODUCED / INCONCLUSIVE) and offering a fix for each confirmed failure, one
+at a time, each requiring user approval. Entered ONLY on explicit user
+acceptance (see Step 6). In read-only hosts/modes, skip the offer; reasoning
+mode stands alone.
 
 Optional pre-deploy hook (Cursor, Claude Code, …): see `extensions/pre-deploy-gate/README.md`.
 
@@ -133,9 +134,10 @@ coverage note:
 
 > "Want me to write and run tests for any of these failure modes?"
 
-If the user accepts and picks rows ("top N" is valid), **READ
-`references/execution-mode.md` now** and follow it. If the user declines, or
-the host is read-only, the run ends here — identical to reasoning mode today.
+If the user accepts, have them pick rows if they haven't ("top N" is valid),
+then **READ `references/execution-mode.md` now** and follow it. If the user
+declines, or the host is read-only, the run ends here — a pure reasoning-mode
+run.
 
 ## Quick Reference
 
