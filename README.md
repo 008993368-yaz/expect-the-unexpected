@@ -121,10 +121,10 @@ assumptions.
 
 The structure stays compatible with host-specific add-ons:
 
-- **Pre-deploy gate hook** — optional Cursor hook that pauses deploy commands and
-  injects the current git diff for Stage 0 analysis. Install from
-  [`extensions/pre-deploy-gate/`](extensions/pre-deploy-gate/README.md) into your
-  project's `.cursor/hooks/` (not into the skill folder).
+- **Pre-deploy gate hook** — optional host hook (Cursor, Claude Code, …) that
+  pauses deploy commands and injects the current git diff for Stage 0 analysis.
+  Install from [`extensions/pre-deploy-gate/`](extensions/pre-deploy-gate/README.md)
+  into your project's host hooks config (not into the skill folder).
 - **Execution mode** — run generated test cases via an MCP server or similar
   tooling instead of only suggesting them. Lives in the host's MCP/tooling config,
   not here.
