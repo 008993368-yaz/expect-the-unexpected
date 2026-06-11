@@ -88,6 +88,11 @@ Examples:
 6. **Coverage note.** Every run ends with an explicit caveat: these are known
    failure classes, not proof of correctness — and any generated-but-unselected
    scenarios remain unanalyzed.
+7. **Execution offer (opt-in).** If the host can write files and run commands,
+   it offers to turn selected FMEA rows into real test files, run them with
+   your project's test runner, and report per-row verdicts — offering approved
+   fixes, one at a time, for confirmed failures. Declining leaves the run
+   identical to reasoning mode.
 
 ## Scope
 
@@ -95,6 +100,15 @@ Examples:
 cases for you to run — and generates scenarios themselves from a bounded surface
 when needed. It does not execute tests or modify code, and it never claims the
 software is "safe."
+
+**Execution mode (opt-in).** After every analysis, the skill can — only with
+your explicit go-ahead — write the generated test cases into your project's
+test suite, run them with your own test runner, and report which failure modes
+are CONFIRMED, NOT REPRODUCED, or INCONCLUSIVE. Confirmed failures get the
+FMEA row's mitigation offered as a fix, one at a time, each requiring your
+approval. Generated tests are kept by default as regression coverage. External
+dependencies are always mocked — it never contacts real third-party services
+or touches real data destructively.
 
 ## Layout
 
@@ -104,6 +118,7 @@ expect-the-unexpected/
   references/
     failure-taxonomy.md        # 8-category taxonomy (lens + generator) + pre-mortem
     scenario-generation.md     # Stage 0: bounded surface -> ranked scenario menu
+    execution-mode.md          # Opt-in: write & run generated tests, verdicts, fix loop
   README.md                    # Install + design notes (this file)
 ```
 
@@ -126,9 +141,6 @@ standalone without them.
   that pauses deploy commands and injects the current git diff for Stage 0 analysis.
   Install from [`extensions/pre-deploy-gate/`](extensions/pre-deploy-gate/README.md)
   into your project's host hooks config (not into the skill folder).
-- **Execution mode** *(not built)* — run generated test cases via an MCP server or
-  similar tooling instead of only suggesting them. Would live in the host's
-  MCP/tooling config, not here.
 
 ## License
 
