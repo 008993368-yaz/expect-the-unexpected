@@ -23,6 +23,15 @@ emit_allow() {
   esac
 }
 
+# Fail-open: hook errors must never block deploy (hosts should set failClosed: false too)
+fail_open_on_error() {
+  echo "pre-deploy-gate: internal error (exit $?), allowing deploy (fail-open)" >&2
+  HOST_FORMAT="${HOST_FORMAT:-${DEPLOY_GATE_HOST:-cursor}}"
+  emit_allow
+  exit 0
+}
+trap fail_open_on_error ERR
+
 emit_ask() {
   local user_msg="$1"
   local agent_msg="$2"

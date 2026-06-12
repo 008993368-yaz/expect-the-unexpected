@@ -84,7 +84,8 @@ Examples:
 4. **Pre-mortem.** It assumes the scenario *already* caused a production outage
    and narrates what happened — catching what forward reasoning missed.
 5. **FMEA output.** Findings come back as a risk-ranked table: failure mode →
-   trigger → symptom → likelihood × impact → mitigation or test to write.
+   trigger → symptom → likelihood × impact (via a fixed 3×3 matrix) → mitigation
+   or test to write. See [`examples/`](examples/) for full samples.
 6. **Coverage note.** Every run ends with an explicit caveat: these are known
    failure classes, not proof of correctness — and any generated-but-unselected
    scenarios remain unanalyzed.
@@ -108,20 +109,35 @@ test runner, and report which failure modes are CONFIRMED, NOT REPRODUCED, or
 INCONCLUSIVE. Confirmed failures get the
 FMEA row's mitigation offered as a fix, one at a time, each requiring your
 approval. Generated tests are kept by default as regression coverage. External
-dependencies are always mocked — it never contacts real third-party services
-or touches real data destructively.
+dependencies are always mocked via the **project's existing test stack**
+(Jest/Vitest mocks, pytest `unittest.mock`, etc.) — it never contacts live
+third-party services or touches real data destructively. See
+`references/execution-mode.md` for the trust boundary.
 
 ## Layout
 
 ```
 expect-the-unexpected/
   SKILL.md                     # Lean entry point + routing + per-scenario flow
+  CHANGELOG.md                 # Version history (matches SKILL.md version field)
   references/
     failure-taxonomy.md        # 8-category taxonomy (lens + generator) + pre-mortem
     scenario-generation.md     # Stage 0: bounded surface -> ranked scenario menu
     execution-mode.md          # Opt-in: write & run generated tests, verdicts, fix loop
+  examples/                    # Worked input → FMEA output (calibration)
+  evals/
+    benchmark.json             # With-skill / without-skill eval cases
+  scripts/
+    validate.sh                # Package lint (links, layout, frontmatter)
+  extensions/
+    pre-deploy-gate/           # Optional deploy hook (fail-open)
   README.md                    # Install + design notes (this file)
 ```
+
+**Version:** see `version` in `SKILL.md` frontmatter and [CHANGELOG.md](CHANGELOG.md).
+Re-pull or re-link when the version bumps.
+
+**CI:** `.github/workflows/validate.yml` runs `scripts/validate.sh` on push/PR.
 
 ## Design
 
@@ -140,8 +156,10 @@ standalone without them.
 
 - **Pre-deploy gate hook** *(built)* — optional host hook (Cursor, Claude Code, …)
   that pauses deploy commands and injects the current git diff for Stage 0 analysis.
-  Install from [`extensions/pre-deploy-gate/`](extensions/pre-deploy-gate/README.md)
-  into your project's host hooks config (not into the skill folder).
+  Fail-open by design: hook errors, missing git, or empty diffs allow deploy;
+  set `failClosed: false` in host config. Install from
+  [`extensions/pre-deploy-gate/`](extensions/pre-deploy-gate/README.md) into your
+  project's host hooks config (not into the skill folder).
 
 ## License
 

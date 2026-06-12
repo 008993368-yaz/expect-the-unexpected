@@ -18,6 +18,31 @@ point — but only within the rules below.
 - **Mock or fake every external dependency.** Never contact real third-party
   services (payment APIs, email providers, live deploys). Never perform
   destructive operations against real data.
+
+### Trust boundary — how mocking works
+
+Use the **project's existing test framework** — do not add a parallel mocking
+stack without explicit approval.
+
+| Stack | Prefer | Avoid |
+|-------|--------|-------|
+| Vitest / Jest | `vi.mock` / `jest.mock` on modules; `msw` only if the project already uses it | Real `fetch` to Stripe, SendGrid, etc. |
+| pytest | `unittest.mock.patch`, `monkeypatch`, project fixtures / `responses` if already present | Hitting staging DB or live APIs |
+| Go | `httptest`, interface fakes, existing `gomock` / mockgen stubs | `os.Getenv` pointing at prod |
+| .NET | `Moq` / NSubstitute patterns already in the repo | Integration tests against shared envs |
+
+Rules of thumb:
+
+- **Read two existing tests first** — match file location, naming, and how that
+  repo already stubs HTTP/DB/email.
+- **Inject at the boundary** the production code calls (the Stripe client module,
+  the `db.orders` repository), not deep internals — unless the repo does.
+- **No network by default** — if a test would dial out, it is NOT EXECUTABLE until
+  a mock is identified or the user approves adding a dev dependency.
+- **No destructive writes** — use transactions rolled back, in-memory fakes, or
+  temp dirs; never truncate shared tables or delete prod-like fixtures.
+- **Env vars** — do not point tests at `DATABASE_URL`, API keys, or webhooks
+  from the user's shell; use test-only values or mocks.
 - **Never install or scaffold test infrastructure without explicit approval.**
 - **Never batch-apply fixes.** One confirmed failure → one offered fix → one
   approval → one re-run.

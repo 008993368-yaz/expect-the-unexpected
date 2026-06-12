@@ -1,0 +1,25 @@
+name: validate
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run package validate script
+        run: bash scripts/validate.sh
+
+      - name: Shellcheck pre-deploy gate (if available)
+        run: |
+          if command -v shellcheck >/dev/null 2>&1; then
+            shellcheck extensions/pre-deploy-gate/scripts/pre-deploy-gate.sh
+          else
+            sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+            shellcheck extensions/pre-deploy-gate/scripts/pre-deploy-gate.sh
+          fi
