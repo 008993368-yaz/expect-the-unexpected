@@ -10,6 +10,15 @@ JSON on stdin/stdout. Host-specific install configs live under `hosts/`.
 This is an **advisory soft gate** — you can allow deploy after review. It is not
 a security control and does not prove correctness.
 
+**Graceful degradation:** The gate is designed to **never block deploy on
+failure**. The shared script fail-opens on internal errors (`main` exits non-zero
+→ allow).
+It also allows deploy when: the hook is disabled (`DEPLOY_GATE_ENABLED=0`), the
+command is not a deploy, git is unavailable, the base ref is missing, or the
+diff is empty. Configure your host with **`failClosed: false`** (Cursor) so hook
+crashes or timeouts also allow deploy. Analysis errors in the agent thread do
+not affect the hook — only the shell gate script runs at deploy time.
+
 ## What it does
 
 1. Intercepts deploy shell commands (via your host's hook config).
@@ -76,7 +85,7 @@ echo '{"command":"vercel deploy"}' | DEPLOY_GATE_BASE_REF=HEAD bash scripts/pre-
 ## Limitations
 
 - **Advisory only** — not proof the software is safe; the skill's coverage caveat still applies.
-- **Fail-open** — configure your host hook so errors do not block deploy.
+- **Fail-open by design** — script trap + empty-diff/git-missing paths always allow; set `failClosed: false` in host config. If Stage 0 analysis errors out in chat, deploy is unaffected.
 - **Diff may contain secrets** — review before sharing logs or screenshots.
 - **Deploy matcher** — Cursor filters in `hooks.json`; Claude Code filters inside the script (matcher is `Bash`).
 - **Windows** — requires Git Bash or WSL; native PowerShell variant not included in v1.

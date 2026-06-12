@@ -88,67 +88,78 @@ detect_host() {
   printf 'cursor'
 }
 
-enabled="${DEPLOY_GATE_ENABLED:-1}"
-if [[ "$enabled" == "0" ]]; then
-  HOST_FORMAT="${DEPLOY_GATE_HOST:-cursor}"
-  emit_allow
-  exit 0
-fi
+main() {
+  local enabled input command base_ref max_lines diff_out truncated line_count
+  local trunc_note agent_msg user_msg
 
-input="$(cat)"
-HOST_FORMAT="$(detect_host "$input")"
-
-command="$(extract_command "$input")"
-if [[ -n "$command" ]] && ! is_deploy_command "$command"; then
-  emit_allow
-  exit 0
-fi
-
-base_ref="${DEPLOY_GATE_BASE_REF:-origin/main}"
-max_lines="${DEPLOY_GATE_MAX_LINES:-500}"
-
-if ! git rev-parse --git-dir >/dev/null 2>&1; then
-  echo "pre-deploy-gate: not a git repo, allowing" >&2
-  emit_allow
-  exit 0
-fi
-
-if ! git rev-parse --verify "$base_ref" >/dev/null 2>&1; then
-  if git rev-parse --verify main >/dev/null 2>&1; then
-    base_ref="main"
-  else
-    echo "pre-deploy-gate: base ref not found, allowing" >&2
+  enabled="${DEPLOY_GATE_ENABLED:-1}"
+  if [[ "$enabled" == "0" ]]; then
+    HOST_FORMAT="${DEPLOY_GATE_HOST:-cursor}"
     emit_allow
-    exit 0
+    return 0
   fi
-fi
 
-diff_out="$(git diff "$base_ref"...HEAD 2>/dev/null || true)"
-if [[ -z "${diff_out//[[:space:]]/}" ]]; then
-  emit_allow
-  exit 0
-fi
+  input="$(cat)"
+  HOST_FORMAT="$(detect_host "$input")"
 
-truncated="false"
-line_count="$(printf '%s\n' "$diff_out" | wc -l | tr -d ' ')"
-if [[ "$line_count" -gt "$max_lines" ]]; then
-  diff_out="$(printf '%s\n' "$diff_out" | head -n "$max_lines")"
-  truncated="true"
-fi
+  command="$(extract_command "$input")"
+  if [[ -n "$command" ]] && ! is_deploy_command "$command"; then
+    emit_allow
+    return 0
+  fi
 
-trunc_note=""
-if [[ "$truncated" == "true" ]]; then
-  trunc_note=" Diff truncated to ${max_lines} lines; note in coverage caveat."
-fi
+  base_ref="${DEPLOY_GATE_BASE_REF:-origin/main}"
+  max_lines="${DEPLOY_GATE_MAX_LINES:-500}"
 
-agent_msg="Before deploy: run expect-the-unexpected Stage 0 on the bounded surface below. READ references/scenario-generation.md. Present a ranked scenario menu (~5-8); analyze scenarios the user picks. Do not claim the software is safe — end with the coverage caveat.${trunc_note}
+  if ! git rev-parse --git-dir >/dev/null 2>&1; then
+    echo "pre-deploy-gate: not a git repo, allowing" >&2
+    emit_allow
+    return 0
+  fi
+
+  if ! git rev-parse --verify "$base_ref" >/dev/null 2>&1; then
+    if git rev-parse --verify main >/dev/null 2>&1; then
+      base_ref="main"
+    else
+      echo "pre-deploy-gate: base ref not found, allowing" >&2
+      emit_allow
+      return 0
+    fi
+  fi
+
+  diff_out="$(git diff "$base_ref"...HEAD 2>/dev/null || true)"
+  if [[ -z "${diff_out//[[:space:]]/}" ]]; then
+    emit_allow
+    return 0
+  fi
+
+  truncated="false"
+  line_count="$(printf '%s\n' "$diff_out" | wc -l | tr -d ' ')"
+  if [[ "$line_count" -gt "$max_lines" ]]; then
+    diff_out="$(printf '%s\n' "$diff_out" | head -n "$max_lines")"
+    truncated="true"
+  fi
+
+  trunc_note=""
+  if [[ "$truncated" == "true" ]]; then
+    trunc_note=" Diff truncated to ${max_lines} lines; note in coverage caveat."
+  fi
+
+  agent_msg="Before deploy: run expect-the-unexpected Stage 0 on the bounded surface below. READ references/scenario-generation.md. Present a ranked scenario menu (~5-8); analyze scenarios the user picks. Do not claim the software is safe — end with the coverage caveat.${trunc_note}
 
 Base ref: ${base_ref}...HEAD
 
 --- diff ---
 ${diff_out}"
 
-user_msg="Deploy paused — review failure-mode scenarios for this diff before proceeding. You can cancel or allow deploy after review."
+  user_msg="Deploy paused — review failure-mode scenarios for this diff before proceeding. You can cancel or allow deploy after review."
 
-emit_ask "$user_msg" "$agent_msg"
-exit 0
+  emit_ask "$user_msg" "$agent_msg"
+}
+
+# Fail-open: hook errors must never block deploy (hosts should set failClosed: false too)
+if ! main; then
+  echo "pre-deploy-gate: internal error, allowing deploy (fail-open)" >&2
+  HOST_FORMAT="${HOST_FORMAT:-${DEPLOY_GATE_HOST:-cursor}}"
+  emit_allow
+fi

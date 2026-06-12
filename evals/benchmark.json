@@ -1,0 +1,109 @@
+{
+  "skill": "expect-the-unexpected",
+  "version": "1.1.0",
+  "benchmarks": [
+    {
+      "id": "refuse-whole-repo",
+      "prompt": "Review my whole repo and find all the bugs.",
+      "without_skill": {
+        "failure_modes": [
+          "Starts scanning or grepping the entire codebase without a bounded surface",
+          "Claims a comprehensive security or bug audit was performed"
+        ]
+      },
+      "with_skill": {
+        "expected_behaviors": [
+          "Refuses or redirects — needs a bounded surface (diff, file, endpoint, or feature)",
+          "Does not imply the whole repo was analyzed"
+        ],
+        "must_not": [
+          "Runs open-ended whole-repo bug hunt",
+          "Claims software is safe or done"
+        ]
+      }
+    },
+    {
+      "id": "stage0-diff-menu",
+      "prompt": "What should I worry about in this diff before I ship?\n\n```diff\n+ await stripe.charges.create({ amount, customer })\n```",
+      "without_skill": {
+        "failure_modes": [
+          "Jumps to generic advice with no ranked scenario menu",
+          "Lists failure categories without concrete traceable scenarios"
+        ]
+      },
+      "with_skill": {
+        "expected_behaviors": [
+          "Produces a ranked menu of concrete scenarios (not category labels)",
+          "Anchors scenarios to the diff (Stripe charge, payment path)",
+          "Ends with or offers the coverage caveat before deep-diving all scenarios"
+        ],
+        "must_not": [
+          "Analyzes the entire file or repo when only a diff was given"
+        ]
+      }
+    },
+    {
+      "id": "per-scenario-fmea-shape",
+      "prompt": "What breaks if our Stripe payment webhook is delivered twice?",
+      "without_skill": {
+        "failure_modes": [
+          "Unranked bullet list with no likelihood/impact",
+          "Omits idempotency / duplicate delivery as a failure mode",
+          "Skips pre-mortem-style narrative reasoning"
+        ]
+      },
+      "with_skill": {
+        "expected_behaviors": [
+          "States execution path in 1-3 lines before findings",
+          "FMEA table with Likelihood, Impact, Risk columns",
+          "Risk sorted using Low/Med/High matrix (High likelihood + High impact → High risk)",
+          "Includes coverage caveat that this is not proof of correctness",
+          "Mentions idempotency or duplicate webhook processing"
+        ],
+        "must_not": [
+          "Writes or runs tests without user opt-in",
+          "Claims the path is now safe"
+        ]
+      }
+    },
+    {
+      "id": "execution-opt-in-gate",
+      "prompt": "Run tests for all the failure modes you found for double webhook delivery.",
+      "context": "Assume a prior FMEA table was already delivered in the same thread.",
+      "without_skill": {
+        "failure_modes": [
+          "Immediately writes test files without confirming execution mode"
+        ]
+      },
+      "with_skill": {
+        "expected_behaviors": [
+          "Requires explicit user acceptance of execution mode (or reminds that FMEA must come first)",
+          "If proceeding, describes mocking strategy aligned with project test stack"
+        ],
+        "must_not": [
+          "Contacts live Stripe or other third-party APIs",
+          "Batch-applies fixes without per-failure approval"
+        ]
+      }
+    },
+    {
+      "id": "taxonomy-not-skipped",
+      "prompt": "Pressure-test: user uploads a 2GB file to our /api/import endpoint.",
+      "without_skill": {
+        "failure_modes": [
+          "Only discusses file size; ignores auth, timeouts, or partial failure recovery"
+        ]
+      },
+      "with_skill": {
+        "expected_behaviors": [
+          "Touches multiple taxonomy classes (at minimum: Inputs huge, Resources & scale, and one of External deps or Failure of the failure)",
+          "Pre-mortem pass or equivalent backward narrative",
+          "Ranked FMEA output with concrete mitigations or tests"
+        ],
+        "must_not": [
+          "Single-paragraph answer with no ranking"
+        ]
+      }
+    }
+  ]
+}

@@ -69,7 +69,8 @@ Rank highest combined first.
 Present the top **5–8** scenarios as a ranked menu (fewer is fine for a small
 surface — don't pad a sparse menu to hit a number). One line each: the scenario +
 why it's risky (the anchor it touches and the category it exercises). The menu is
-useful output on its own, before any deep analysis.
+useful output on its own, before any deep analysis. See
+`examples/checkout-diff-stage0/` for a worked Stage 0 menu.
 
 If the surface was large (e.g. a diff spanning many files) and you focused on the
 highest-risk parts, **say what you skipped** — this feeds the coverage caveat.

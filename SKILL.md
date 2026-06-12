@@ -1,5 +1,6 @@
 ---
 name: expect-the-unexpected
+version: 1.1.0
 license: MIT
 description: >-
   Use when the user asks what could break / go wrong / fail in a SPECIFIC
@@ -40,7 +41,10 @@ project's own test runner — reporting a per-row verdict (CONFIRMED / NOT
 REPRODUCED / INCONCLUSIVE) and offering a fix for each confirmed failure, one
 at a time, each requiring user approval. Entered ONLY on explicit user
 acceptance (see Step 6). In read-only hosts/modes, skip the offer; reasoning
-mode stands alone.
+mode stands alone. External dependencies are mocked via the **project's
+existing** test stack (Jest/Vitest `vi.mock`, pytest `monkeypatch`/`unittest.mock`,
+`gomock`, etc.) — never live APIs or destructive real-data operations. See
+`references/execution-mode.md` for the trust boundary.
 
 Optional pre-deploy hook (Cursor, Claude Code, …): see `extensions/pre-deploy-gate/README.md`.
 
@@ -70,7 +74,8 @@ feature description) but doesn't know what to fear. **READ
 `references/scenario-generation.md` now** and follow it: gather the surface →
 extract risk anchors → run the taxonomy *in reverse* as a scenario generator →
 rank by blast radius × plausibility → present a ranked menu of ~5–8 concrete
-scenarios → let the user pick ("top N" is valid). Then run Steps 1–6 below on
+scenarios → let the user pick ("top N" is valid). See
+`examples/checkout-diff-stage0/` for a worked menu. Then run Steps 1–6 below on
 each chosen scenario.
 
 ## Per-scenario flow (Steps 1–6)
@@ -86,10 +91,21 @@ key steps → external calls → side effects → response. This anchors the ana
 ### 2. Walk the failure taxonomy
 
 **READ `references/failure-taxonomy.md` now** and walk every category against
-this scenario's path. Categories: inputs, state & timing, external dependencies,
-resources & scale, auth & security, time, money/SaaS, and
-failure-of-the-failure. Skip a category only after confirming it does not touch
-this path.
+this scenario's path. The 8 categories (one-line gloss — full prompts in the
+reference):
+
+| # | Category | Gloss |
+|---|----------|-------|
+| 1 | Inputs | Untrusted data shape, size, encoding |
+| 2 | State & timing | Races, retries, ordering, partial work |
+| 3 | External dependencies | Timeouts, outages, bad responses |
+| 4 | Resources & scale | Volume, memory, pools, cost blowups |
+| 5 | Auth & security | Access control on this path |
+| 6 | Time | Clocks, timezones, expiry, DST |
+| 7 | Money / SaaS | Payments, webhooks, billing drift |
+| 8 | Failure of the failure | Broken error handling / recovery |
+
+Skip a category only after confirming it does not touch this path.
 
 ### 3. Pre-mortem pass
 
@@ -108,11 +124,20 @@ For each failure mode, one row:
 | Failure mode | Trigger | Symptom | Likelihood | Impact | Risk | Mitigation / Test to write |
 
 - **Likelihood** and **Impact**: Low / Med / High.
-- **Risk**: combined rating used to sort — highest risk on top.
+- **Risk**: combined rating used to sort — highest risk on top. Use this matrix
+  (do not improvise):
+
+| Likelihood ↓ / Impact → | Low | Med | High |
+|---------------------------|-----|-----|------|
+| **Low** | Low | Low | Med |
+| **Med** | Low | Med | High |
+| **High** | Med | High | High |
+
 - **Mitigation / Test**: a concrete fix OR a specific test case the user can
   write (inputs + expected behavior). Prefer a test when the fix is unclear.
 
 Group nothing; just rank. Lead with the top 3-5 so the user sees what matters.
+See `examples/` for worked input → output samples.
 
 ### 5. Coverage note (REQUIRED — end every run with this)
 
