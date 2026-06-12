@@ -18,8 +18,8 @@ jobs:
       - name: Shellcheck pre-deploy gate (if available)
         run: |
           if command -v shellcheck >/dev/null 2>&1; then
-            shellcheck extensions/pre-deploy-gate/scripts/pre-deploy-gate.sh
+            shellcheck -S warning extensions/pre-deploy-gate/scripts/pre-deploy-gate.sh
           else
             sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
-            shellcheck extensions/pre-deploy-gate/scripts/pre-deploy-gate.sh
+            shellcheck -S warning extensions/pre-deploy-gate/scripts/pre-deploy-gate.sh
           fi

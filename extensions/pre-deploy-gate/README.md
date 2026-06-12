@@ -11,7 +11,8 @@ This is an **advisory soft gate** — you can allow deploy after review. It is n
 a security control and does not prove correctness.
 
 **Graceful degradation:** The gate is designed to **never block deploy on
-failure**. The shared script fail-opens on internal errors (`ERR` trap → allow).
+failure**. The shared script fail-opens on internal errors (`main` exits non-zero
+→ allow).
 It also allows deploy when: the hook is disabled (`DEPLOY_GATE_ENABLED=0`), the
 command is not a deploy, git is unavailable, the base ref is missing, or the
 diff is empty. Configure your host with **`failClosed: false`** (Cursor) so hook
