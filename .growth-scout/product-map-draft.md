@@ -2,8 +2,9 @@
 
 ## Last refreshed
 
+- [Known] This draft was refreshed on 2026-07-01 during the monthly Growth Scout cron run.
 - [Known] This draft was created on 2026-06-19 during the monthly Growth Scout cron run.
-- [Known] The previously requested `.growth-scout/product-map-draft.md` file was absent before this run.
+- [Known] The previously requested `.growth-scout/product-map-draft.md` file was absent before the 2026-06-19 run.
 
 ## Product surface
 
@@ -49,6 +50,12 @@
 - [Known] GitHub CLI returned no open issues for this repository on 2026-06-19.
 - [Known] GitHub CLI returned no open issues labeled `enhancement` on 2026-06-19.
 - [Known] GitHub CLI returned no open issues labeled `feature-request` on 2026-06-19.
-- [Known] GitHub release list returned `v1.1.0` as the latest release on 2026-06-19.
+- [Known] GitHub MCP `search_issues` returned four open issues on 2026-07-01: #7, #8, #9, and #10.
+- [Known] GitHub MCP `search_issues` returned four open `enhancement` issues on 2026-07-01: #7, #8, #9, and #10.
+- [Known] GitHub MCP `search_issues` returned zero open `feature-request` issues on 2026-07-01.
+- [Known] Open issue #7 is the Growth Scout epic for host-specific adoption recipes and activation checklist.
+- [Known] Open issues #8, #9, and #10 are task issues linked to epic #7.
+- [Inferred] The 2026-07-01 open-issue change is a material planning signal, but not independent external demand because the visible issues are prior Growth Scout outputs.
+- [Known] GitHub release list returned `v1.1.0` as the latest release on 2026-06-19 and 2026-07-01.
 - [Unknown] External user demand by segment is unknown because no Growth Scout MCP work-item mining tool was available in this session.
 - [Unknown] Marketplace install, package download, and active-use metrics are unknown because no analytics source was available in this session.
